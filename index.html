@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="sv">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -7,7 +7,31 @@
     <title>regn.nu</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div class="mainContainer">
+    <h1 class="mainTitle">Regn.nu</h1>
+    <div class="mainContent">
+    <div id="location" class="location"></div>
+    <div id="weatherTemp" class="weatherTemp"></div>
+    <div id="weatherIcons" class="weatherIcons"></div>
+    <div id="weatherDesc" class="weatherDesc"></div>
+    <span class="slogan">Det finns inget dåligt väder, Bara dåliga kläder</span>
+    </div>
+    </div>
+    <dialog id="location-dialog">
+    <div class="location-dialog-content">
+        <h2>Var är du?</h2>
+
+        <p>För att visa rätt väder behöver vi veta ungefär var du befinner dig.</p>
+
+        <button id="use-location">
+            📍 Använd min plats
+        </button>
+
+        <button id="choose-city">
+            🏙️ Välj stad
+        </button>
+    </div>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

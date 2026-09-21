@@ -1,0 +1,36 @@
+html {
+    background-color: #080808;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+}
+
+dialog {
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 5px;
+    padding: 20px;
+    width: 300px;
+    color: #ffffff;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog button {
+    background-color: #333333;
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+dialog .city-results {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    max-height: 150px;
+    overflow-y: auto;
+}
