@@ -16,7 +16,6 @@ const locations: Location[] = locationsData.map(location => ({
 }));
 
 const locationElm = document.querySelector<HTMLDivElement>("#location");
-if (locationElm) { locationElm.innerHTML = `<span>${locations[3].name}</span>`; }
 
 /* Open the location dialog when the page loads */
 const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
@@ -36,12 +35,11 @@ useLocationButton?.addEventListener("click", () => {
             localStorage.setItem("location", "gps");
             locationDialog?.close();
             console.log('geolocation:', 'lat: ' + latitude + ', lon: ' + longitude);
-            const location = locations.find(loc => loc.lat === latitude && loc.lon === longitude);
-            if (location) {
-                console.log('Ort:', location.name);
-                localStorage.setItem("cityName", location.name);
-            } else {
-                console.log('Ort ej hittad i listan.');
+            const location = findNearestLocation(latitude, longitude);
+            console.log("Närmaste ort:", location.name);
+            localStorage.setItem("cityName", location.name);
+            if (locationElm) {
+            locationElm.innerHTML = `<span>${location.name}</span>`;
             }
             // Hämta GPS väder här
         },
@@ -138,6 +136,53 @@ cityResults?.addEventListener("click", (event) => {
 
 }
 
+function findNearestLocation(lat: number, lon: number): Location {
+    let nearestLocation = locations[0];
+    let shortestDistance = Infinity;
+
+    for (const location of locations) {
+        const distance = getDistance(
+            lat,
+            lon,
+            location.lat,
+            location.lon
+        );
+
+        if (distance < shortestDistance) {
+            shortestDistance = distance;
+            nearestLocation = location;
+        }
+    }
+
+    return nearestLocation;
+}
+
+function getDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+): number {
+    const earthRadius = 6371;
+
+    const latDifference = toRadians(lat2 - lat1);
+    const lonDifference = toRadians(lon2 - lon1);
+
+    const a =
+        Math.sin(latDifference / 2) ** 2 +
+        Math.cos(toRadians(lat1)) *
+        Math.cos(toRadians(lat2)) *
+        Math.sin(lonDifference / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadius * c;
+}
+
+function toRadians(degrees: number): number {
+    return degrees * Math.PI / 180;
+}
+
 /* Get the user's location */
 export function getLocation(): Promise<GeolocationPosition> {
     return new Promise((resolve, reject) => {
@@ -147,7 +192,3 @@ export function getLocation(): Promise<GeolocationPosition> {
         );
     });
 }
-
-const position = await getLocation();
-const { latitude, longitude } = position.coords;
-console.log(latitude, longitude);
