@@ -33,6 +33,8 @@ useLocationButton?.addEventListener("click", () => {
         (position) => {
             const { latitude, longitude } = position.coords;
             localStorage.setItem("location", "gps");
+            localStorage.setItem("lat", latitude.toString());
+            localStorage.setItem("long", longitude.toString());
             locationDialog?.close();
             console.log('geolocation:', 'lat: ' + latitude + ', lon: ' + longitude);
             const location = findNearestLocation(latitude, longitude);
@@ -74,6 +76,12 @@ if (locationDialog) {
     </button>
 </div>`;
 }
+
+const backToLocationButton = document.querySelector<HTMLButtonElement>("#back-to-location");
+backToLocationButton?.addEventListener("click", () => {
+    locationDialog?.close();
+    locationDialog?.showModal();
+});
 
 const searchInput =
     document.querySelector<HTMLInputElement>("#city-search");
@@ -126,8 +134,8 @@ cityResults?.addEventListener("click", (event) => {
 
     localStorage.setItem("location", "city");
     localStorage.setItem("cityName", name);
-    localStorage.setItem("latitude", lat.toString());
-    localStorage.setItem("longitude", lon.toString());
+    localStorage.setItem("lat", lat.toString());
+    localStorage.setItem("long", lon.toString());
 
     locationDialog?.close();
 
