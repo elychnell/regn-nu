@@ -31,22 +31,37 @@ const useLocationButton = document.querySelector<HTMLButtonElement>("#use-locati
 useLocationButton?.addEventListener("click", () => {
     navigator.geolocation.getCurrentPosition(
         (position) => {
-            const { latitude, longitude } = position.coords;
+            const { latitude, longitude, accuracy  } = position.coords;
+            console.log("Accuracy:", accuracy);
             localStorage.setItem("location", "gps");
             localStorage.setItem("lat", latitude.toString());
             localStorage.setItem("long", longitude.toString());
+            localStorage.setItem("accuracy", accuracy.toString());
             locationDialog?.close();
-            console.log('geolocation:', 'lat: ' + latitude + ', lon: ' + longitude);
+            if (accuracy <= 2000) {
             const location = findNearestLocation(latitude, longitude);
-            console.log("Närmaste ort:", location.name);
             localStorage.setItem("cityName", location.name);
+            }
+            const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+            console.log('geolocation:', 'lat: ' + latitude + ', lon: ' + longitude);
+
             if (locationElm) {
-            locationElm.innerHTML = `<span>${location.name}</span>`;
+            locationElm.innerHTML = `<span>Väder räknat från: ${latitude}, ${longitude}</span>
+                                     <span>Platsens osäkerhet: ${formatAccuracy(accuracy)}</span>
+                                     <a href="${mapsUrl}" target="_blank">Visa på karta</a>
+                                     <button id="chooseLocation">Byt plats</button>`;
             }
             // Hämta GPS väder här
+            getWeather(latitude, longitude);
         },
         () => {
             showCityPicker();
+        },
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 10000
         }
     );
 });
@@ -55,6 +70,14 @@ const chooseCityButton = document.querySelector<HTMLButtonElement>("#choose-city
 chooseCityButton?.addEventListener("click", () => {
     showCityPicker();
 });
+
+function formatAccuracy(accuracy: number): string {
+    if (accuracy < 1000) {
+        return `${Math.round(accuracy)} m`;
+    }
+
+    return `${(accuracy / 1000).toFixed(1)} km`;
+}
 
 function showCityPicker(locationDialog: HTMLDialogElement | null = document.querySelector<HTMLDialogElement>("#location-dialog")) {
 if (locationDialog) {
@@ -140,8 +163,77 @@ cityResults?.addEventListener("click", (event) => {
     locationDialog?.close();
 
     // Hämta CITY PICKER väder här
+    getWeather(lat, lon);
 });
 
+}
+
+const enterCoordinatesButton =
+    document.querySelector<HTMLButtonElement>("#enter-coordinates");
+
+enterCoordinatesButton?.addEventListener("click", () => {
+    showCoordinatePicker();
+});
+
+function showCoordinatePicker(
+    locationDialog: HTMLDialogElement | null =
+        document.querySelector<HTMLDialogElement>("#location-dialog")
+) {
+    if (locationDialog) {
+        locationDialog.innerHTML = `
+            <div id="coordinate-picker">
+                <h2>Ange koordinater</h2>
+
+                <label for="latitude">Latitud</label>
+                <input
+                    type="number"
+                    id="latitude"
+                    placeholder="59.8586"
+                    step="any"
+                >
+
+                <label for="longitude">Longitud</label>
+                <input
+                    type="number"
+                    id="longitude"
+                    placeholder="17.6389"
+                    step="any"
+                >
+
+                <button id="use-coordinates">
+                    Använd koordinater
+                </button>
+
+                <button id="back-to-location">
+                    ← Tillbaka
+                </button>
+            </div>
+        `;
+    }
+    
+    const useCoordinatesButton =
+    document.querySelector<HTMLButtonElement>("#use-coordinates");
+
+useCoordinatesButton?.addEventListener("click", () => {
+    const latitudeInput =
+        document.querySelector<HTMLInputElement>("#latitude");
+
+    const longitudeInput =
+        document.querySelector<HTMLInputElement>("#longitude");
+
+    const latitude = Number(latitudeInput?.value);
+    const longitude = Number(longitudeInput?.value);
+
+    console.log("Manuella koordinater:", latitude, longitude);
+});
+
+    const backToLocationButton =
+        document.querySelector<HTMLButtonElement>("#back-to-location");
+
+    backToLocationButton?.addEventListener("click", () => {
+        locationDialog?.close();
+        locationDialog?.showModal();
+    });
 }
 
 function findNearestLocation(lat: number, lon: number): Location {
@@ -191,12 +283,22 @@ function toRadians(degrees: number): number {
     return degrees * Math.PI / 180;
 }
 
-/* Get the user's location */
-export function getLocation(): Promise<GeolocationPosition> {
-    return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-            resolve,
-            reject
-        );
-    });
+async function getWeather(lat: number, lon: number) {
+    const url = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json`;
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`SMHI request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log("SMHI data:", data);
+
+        return data;
+    } catch (error) {
+        console.error("Kunde inte hämta väderdata:", error);
+    }
 }
