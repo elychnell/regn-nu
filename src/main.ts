@@ -1,15 +1,17 @@
 import "./scss/style.scss";
 import locationsData from "./data/svenska-orter.json"
-import { weatherIcons } from "./weatherSymbols.ts";
-import type { Location, WeatherPoint, WeatherResponse, DayForecast } from "./types.ts";
+import { getWeatherIcon } from "./utils/weatherSymbols.ts";
+import type { DayForecast,MorningForecast, Location } from "./types.ts";
+import { buildDayForecasts, buildMorningForecasts, getNextMorningForecast, getTodayForecast, formatSwedishTime, } from "./utils/forecast.ts";
 
 
 /* Mapping the data to the Location interface */
 const locations: Location[] = locationsData.map(location => ({
     name: location.locality,
-    lat: location.lat,
-    lon: location.lon,
     municipality: location.municipality,
+    county: location.county,
+    lat: location.lat,
+    lon: location.lon,   
 }));
 
 const locationElm = document.querySelector<HTMLDivElement>("#location");
@@ -58,18 +60,21 @@ if (!savedLocation) {
             const lon = Number(localStorage.getItem("long"));
             printLocationInfo("city", lat, lon);
             getWeather(lat, lon);
+            scheduleWeatherUpdate(lat, lon);
             break;
         case "manual":
             const manualLat = Number(localStorage.getItem("latitude"));
             const manualLon = Number(localStorage.getItem("longitude"));
             printLocationInfo("Manual", manualLat, manualLon);
             getWeather(manualLat, manualLon);
+            scheduleWeatherUpdate(manualLat, manualLon);
             break;
         case "gps":
             const gpsLat = Number(localStorage.getItem("lat"));
             const gpsLon = Number(localStorage.getItem("long"));
             printLocationInfo("GPS", gpsLat, gpsLon);
             getWeather(gpsLat, gpsLon);
+            scheduleWeatherUpdate(gpsLat, gpsLon);
             break;
     }
 }
@@ -86,10 +91,10 @@ function useLocationClick() {
             locationDialog?.close();
             
             const location = findNearestLocation(latitude, longitude);
-            localStorage.setItem("cityName", location.name);
-
+            localStorage.setItem("cityName", formatCity(location));
             printLocationInfo("GPS", latitude, longitude);
             getWeather(latitude, longitude);
+            scheduleWeatherUpdate(latitude, longitude);
         },
         () => {
             showCityPicker();
@@ -153,26 +158,50 @@ searchInput?.addEventListener("input", () => {
         return;
     }
 
-    const results = locationsData
-        .filter(location =>
-            location.locality.toLowerCase().includes(search)
-        )
-        .slice(0, 10);
+    const results = locations
+    .map(location => {
+        const name = location.name.toLowerCase();
+        const municipality = location.municipality?.toLowerCase() ?? "";
+
+        let priority = 3;
+
+        if (name === search) {
+            priority = 0; // Exakt ortsnamn
+        } else if (name.includes(search)) {
+            priority = 1; // Del av ortsnamnet
+        } else if (municipality.includes(search)) {
+            priority = 2; // Kommun
+        }
+
+        return { location, priority };
+    })
+    .filter(result => result.priority < 3)
+    .sort((a, b) =>
+        a.priority - b.priority ||
+        a.location.name.localeCompare(b.location.name, "sv")
+    )
+    .slice(0, 10);
 
     cityResults!.innerHTML = results
-        .map(location => `
+    .map(({ location, priority }) => {
+        const name = priority === 3
+            ? `${location.name} (${location.municipality}, ${location.county} län)`
+            : formatCity(location);
+
+        return `
             <li>
                 <button
                     class="city-result"
                     data-lat="${location.lat}"
                     data-lon="${location.lon}"
-                    data-name="${formatCity(location)}"
+                    data-name="${name}"
                 >
-                    ${formatCity(location)}
+                    ${name}
                 </button>
             </li>
-        `)
-        .join("");
+        `;
+    })
+    .join("");
 });
 
 cityResults?.addEventListener("click", (event) => {
@@ -195,8 +224,8 @@ cityResults?.addEventListener("click", (event) => {
 
     locationDialog?.close();
     printLocationInfo("city", lat, lon);
-    // Hämta CITY PICKER väder här
     getWeather(lat, lon);
+    scheduleWeatherUpdate(lat, lon);
 });
 
 }
@@ -323,6 +352,7 @@ useCoordinatesButton?.addEventListener("click", () => {
 
     printLocationInfo("Manual", lat, lon);
     getWeather(lat, lon);
+    scheduleWeatherUpdate(lat, lon);
 });
 
     const backToLocationButton =
@@ -393,6 +423,71 @@ function toRadians(degrees: number): number {
     return degrees * Math.PI / 180;
 }
 
+
+function printWeatherForecast(
+    today: DayForecast | undefined,
+    nextMorning: MorningForecast | undefined
+) {
+    const weatherElm =
+        document.querySelector<HTMLElement>("#weather-forecast");
+
+    if (!weatherElm) return;
+
+    const formatTemperature = (temperature: number) =>
+        temperature.toLocaleString("sv-SE", {
+            maximumFractionDigits: 1,
+        });
+
+    weatherElm.innerHTML = `
+        <section class="today-forecast">
+            <h2>Idag${today ? ` – ${today.date}` : ""}</h2>
+
+            ${
+                today
+                    ? `
+                        <p>
+                            Temperaturspann:
+                            ${formatTemperature(today.minTemperature)}–${formatTemperature(today.maxTemperature)} °C
+                        </p>
+
+                        <h3>Prognos under dagen</h3>
+
+                        <ul>
+                            ${today.hours.map(point => `
+                                <li>
+                                    ${formatSwedishTime(point.time)}
+                                    – ${formatTemperature(point.data.air_temperature)} °C
+                                </li>
+                            `).join("")}
+                        </ul>
+                    `
+                    : "<p>Ingen prognos tillgänglig för idag.</p>"
+            }
+        </section>
+
+        <section class="morning-forecast">
+            <h2>
+                Nästa morgon${nextMorning ? ` – ${nextMorning.date}` : ""}
+            </h2>
+
+            ${
+                nextMorning
+                    ? `
+                        <ul>
+                            ${nextMorning.hours.map(point => `
+                                <li>
+                                    ${formatSwedishTime(point.time)}
+                                    – ${formatTemperature(point.data.air_temperature)} °C
+                                </li>
+                            `).join("")}
+                        </ul>
+                    `
+                    : "<p>Ingen morgonprognos tillgänglig.</p>"
+            }
+        </section>
+    `;
+}
+
 async function getWeather(lat: number, lon: number) {
     const url = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json`;
 
@@ -404,6 +499,14 @@ async function getWeather(lat: number, lon: number) {
         }
 
         const data = await response.json();
+        const days = buildDayForecasts(data);
+        const mornings = buildMorningForecasts(days);
+
+        const today = getTodayForecast(days);
+        const nextMorning = getNextMorningForecast(mornings);
+
+        printWeatherForecast(today, nextMorning);
+    
         return data;
         } catch (error) {
         console.error("Kunde inte hämta väderdata:", error);
@@ -412,12 +515,23 @@ async function getWeather(lat: number, lon: number) {
 
 
 function formatCity(place: Location): string {
-    if (
-        !place.municipality ||
-        place.locality === place.municipality
-    ) {
-        return place.locality ?? place.name;
+    if ( !place.municipality || place.name === place.municipality )
+    {
+    return place.name;
     }
+    return `${place.name} (${place.municipality})`;
+}
 
-    return `${place.locality ?? place.name} (${place.municipality})`;
+function scheduleWeatherUpdate(lat: number, lon: number) {
+    const now = new Date();
+    const nextHour = new Date(now);
+
+    nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+
+    const delay = nextHour.getTime() - now.getTime();
+
+    setTimeout(async () => {
+        await getWeather(lat, lon);
+        scheduleWeatherUpdate(lat, lon);
+    }, delay);
 }

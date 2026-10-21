@@ -11,30 +11,14 @@
     <h1 class="mainTitle">Regn.nu</h1>
     <div class="mainContent">
     <div id="location" class="location"></div>
-    <div id="weatherTemp" class="weatherTemp"></div>
-    <div id="weatherIcons" class="weatherIcons"></div>
-    <div id="weatherDesc" class="weatherDesc"></div>
+    <section id="weather-forecast" aria-live="polite">
+    <p>Hämtar väderprognos...</p>
+    </section>
     <span class="slogan">Det finns inget dåligt väder, Bara dåliga kläder</span>
     </div>
     </div>
     
-    <dialog id="location-dialog">
-    <div class="location-dialog-content">
-        <h2>Var är du?</h2>
-
-        <p>För att visa rätt väder behöver vi veta ungefär var du befinner dig.</p>
-
-        <button id="use-location">
-        📍 Använd min plats
-        </button>
-        <button id="choose-city">
-            🏙️ Välj stad
-        </button>
-        <button id="enter-coordinates">
-        🌐 Ange koordinater
-        </button>
-    </div>
-    </dialog>
+    <dialog id="location-dialog"></dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

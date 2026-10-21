@@ -14,6 +14,11 @@ export type DayForecast = {
     maxTemperature: number;
 }
 
+export type MorningForecast = {
+    date: string;
+    hours: WeatherPoint[];
+};
+
 export type WeatherResponse = {
     timeSeries: WeatherPoint[];
 }
@@ -24,4 +29,5 @@ export type Location = {
     lon: number;
     municipality?: string;
     locality?: string;
+    county?: string;
 }

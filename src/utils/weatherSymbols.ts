@@ -38,7 +38,9 @@ const rainIcon = `
 </svg>
 `;
 
-export const weatherIcons: Record<string, string> = {
-  temperature: temperatureIcon,
-  rain: rainIcon,
-};
+export function getWeatherIcon(symbolCode: string): string {
+    if (symbolCode.includes("rain")) {
+        return temperatureIcon;
+    }
+    return rainIcon;
+}
