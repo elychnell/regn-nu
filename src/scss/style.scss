@@ -1,3 +1,5 @@
+@use "todays-forecast";
+
 html {
     background-color: #080808;
     font-family: Arial, sans-serif;
@@ -33,4 +35,15 @@ dialog .city-results {
     margin: 10px 0 0 0;
     max-height: 150px;
     overflow-y: auto;
+}
+
+.todays-forecast {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.todays-forecast li {
+  border: 1px solid #333333;
 }
