@@ -151,7 +151,14 @@ cityResults?.addEventListener("click", async (event) => {
     forecast.nextMorning
     );
     }
-    scheduleWeatherUpdate(lat, lon);
+    scheduleWeatherUpdate(lat, lon, (forecast) => {
+        printWeatherForecast(
+            forecast.today,
+            forecast.overviewHours,
+            forecast.nextMorning
+        );
+    });
+    
 });
 
 }
@@ -357,7 +364,13 @@ useCoordinatesButton?.addEventListener("click", async () => {
     forecast.nextMorning
     );
     }
-    scheduleWeatherUpdate(lat, lon);
+    scheduleWeatherUpdate(lat, lon, (forecast) => {
+        printWeatherForecast(
+            forecast.today,
+            forecast.overviewHours,
+            forecast.nextMorning
+        );
+    });
 });
 
 export function formatCity(place: Location): string {

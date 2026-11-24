@@ -36,7 +36,11 @@ export async function getWeather(lat: number, lon: number) {
     }
 }
 
-export function scheduleWeatherUpdate(lat: number, lon: number) {
+export function scheduleWeatherUpdate(
+    lat: number,
+    lon: number,
+    onWeatherUpdate: (forecast: WeatherForecast) => void
+    ) {
     const now = new Date();
     const nextHour = new Date(now);
 
@@ -47,12 +51,8 @@ export function scheduleWeatherUpdate(lat: number, lon: number) {
     setTimeout(async () => {
         const forecast = await getWeather(lat, lon);
         if (forecast) {
-        printWeatherForecast(
-        forecast.today,
-        forecast.overviewHours,
-        forecast.nextMorning
-        );
+        onWeatherUpdate(forecast);
         }
-        scheduleWeatherUpdate(lat, lon);
+        scheduleWeatherUpdate(lat, lon, onWeatherUpdate);
     }, delay);
 }

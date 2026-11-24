@@ -36,7 +36,13 @@ export function useLocationClick() {
             );
             }
             
-            scheduleWeatherUpdate(latitude, longitude);
+            scheduleWeatherUpdate(latitude, longitude, (forecast) => {
+                printWeatherForecast(
+                    forecast.today,
+                    forecast.overviewHours,
+                    forecast.nextMorning
+                );
+            });
         },
         () => {
             showCityPicker();
