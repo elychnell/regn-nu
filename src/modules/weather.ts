@@ -1,6 +1,5 @@
 import { getTodayAndTomorrowPoints, buildRainPeriods } from "./rain.ts";
 import { buildDayForecasts, buildDayOverview, getTodayForecast, buildMorningForecasts, getNextMorningForecast } from "../utils/forecast.ts";
-import { printWeatherForecast } from "./ui.ts";
 
 export async function getWeather(lat: number, lon: number) {
     const url = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json`;
@@ -29,10 +28,8 @@ export async function getWeather(lat: number, lon: number) {
         const mornings = buildMorningForecasts(days);
         const nextMorning = getNextMorningForecast(mornings);
         const morningOverviewHours = nextMorning ? buildDayOverview(data,nextMorning.date,rainPeriods) : undefined;
-      
-        printWeatherForecast(today, overviewHours, nextMorning);
     
-        return data;
+        return {today, overviewHours, nextMorning };
         } catch (error) {
         console.error("Kunde inte hämta väderdata:", error);
     }

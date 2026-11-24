@@ -1,18 +1,6 @@
 import "./scss/style.scss";
-import locationsData from "./data/svenska-orter.json"
-import type { Location } from "./types.ts";
 import { getWeather, scheduleWeatherUpdate } from "./modules/weather.ts";
-import { showLocationPicker, printLocationInfo } from "./modules/ui.ts";
-
-
-/* Mapping the data to the Location interface */
-export const locations: Location[] = locationsData.map(location => ({
-    name: location.locality,
-    municipality: location.municipality,
-    county: location.county,
-    lat: location.lat,
-    lon: location.lon,   
-}));
+import { showLocationPicker, printLocationInfo, printWeatherForecast } from "./modules/ui.ts";
 
 /* Open the location dialog when the page loads */
 const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
@@ -26,7 +14,16 @@ if (!savedLocation) {
             const lat = Number(localStorage.getItem("lat"));
             const lon = Number(localStorage.getItem("long"));
             printLocationInfo("city", lat, lon);
-            getWeather(lat, lon);
+            const forecast = await getWeather(lat, lon);
+
+            if (forecast) {
+            printWeatherForecast(
+            forecast.today,
+            forecast.overviewHours,
+            forecast.nextMorning
+            );
+            }
+            
             scheduleWeatherUpdate(lat, lon);
             break;
         case "manual":

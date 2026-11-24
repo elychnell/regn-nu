@@ -1,4 +1,4 @@
-import type { WeatherPoint, RainPeriod, Location } from "../types";
+import type { WeatherPoint, RainPeriod } from "../types";
 import { dateFormatter } from "../utils/forecast";
 import { rainConfig } from "./rainConfig";
 

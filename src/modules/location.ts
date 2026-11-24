@@ -1,6 +1,6 @@
-import { locations } from "../main.ts";
+import { locations } from "../data/locations.ts";
 import type { Location } from "../types.ts";
-import { formatCity, printLocationInfo, showCityPicker } from "./ui.ts";
+import { formatCity, printLocationInfo, printWeatherForecast, showCityPicker } from "./ui.ts";
 import { getWeather, scheduleWeatherUpdate } from "./weather.ts";
 
 export function formatAccuracy(accuracy: number): string {
@@ -14,7 +14,7 @@ export function formatAccuracy(accuracy: number): string {
 export function useLocationClick() {
     const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
     navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
             const { latitude, longitude, accuracy  } = position.coords;
             console.log("Accuracy:", accuracy);
             localStorage.setItem("location", "gps");
@@ -26,7 +26,16 @@ export function useLocationClick() {
             const location = findNearestLocation(latitude, longitude);
             localStorage.setItem("cityName", formatCity(location));
             printLocationInfo("GPS", latitude, longitude);
-            getWeather(latitude, longitude);
+            const forecast = await getWeather(latitude, longitude);
+
+            if (forecast) {
+            printWeatherForecast(
+            forecast.today,
+            forecast.overviewHours,
+            forecast.nextMorning
+            );
+            }
+            
             scheduleWeatherUpdate(latitude, longitude);
         },
         () => {

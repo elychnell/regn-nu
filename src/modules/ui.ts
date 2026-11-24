@@ -1,8 +1,9 @@
-import { locations } from "../main.ts";
+import { locations } from "../data/locations.ts";
 import type { Location, WeatherPoint, DayForecast, MorningForecast  } from "../types.ts";
 import { getWeather, scheduleWeatherUpdate } from "./weather.ts";
 import { useLocationClick, findNearestLocation, formatAccuracy, isValidCoordinates } from "./location";
-import { formatSwedishWeekday, getWeatherDescription, formatSwedishTime } from "../utils/forecast.ts";
+import { formatSwedishWeekday, formatSwedishTime } from "../utils/forecast.ts";
+import { getWeatherIcon } from "../utils/weatherSymbols.ts";
 
 export function showLocationPicker() {
     const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
@@ -259,8 +260,8 @@ export function printWeatherForecast(
         <div class="nowSection">
         <h2>Idag${today ? ` – ${formatSwedishWeekday(today.date)}` : ""}</h2>
         ${today? `
-        <div class="nowIcon"><p>Icon: ${getWeatherDescription(today.hours[0].data.symbol_code)}</p></div>
-        <p class="nowTemp">${formatTemperature(today.hours[0].data.air_temperature)} °C - ${getWeatherDescription(today.hours[0].data.symbol_code)}</p>
+        <div class="nowIcon"><p>Icon: ${getWeatherIcon(today.hours[0].data.symbol_code)}</p></div>
+        <p class="nowTemp">${formatTemperature(today.hours[0].data.air_temperature)} °C - ${getWeatherIcon(today.hours[0].data.symbol_code)}</p>
         </div>
         <div class ="nowDetails">
         <p class="nowTempRange">${formatTemperature(today.minTemperature)}–${formatTemperature(today.maxTemperature)} °C</p>
@@ -273,7 +274,7 @@ export function printWeatherForecast(
             ${dayOverview?.map(point => `
             <li>
             <p>${formatSwedishTime(point.time)} | Icon:${point.data.symbol_code}</p>
-            <p>${formatTemperature(point.data.air_temperature)} °C – ${getWeatherDescription(point.data.symbol_code)}</p>
+            <p>${formatTemperature(point.data.air_temperature)} °C – ${getWeatherIcon(point.data.symbol_code)}</p>
             </li>
             `).join("")}
             </ul>
@@ -295,7 +296,7 @@ export function printWeatherForecast(
                                 <li>
                                     <p>${formatSwedishTime(point.time)}
                                     – ${formatTemperature(point.data.air_temperature)} °C</p>
-                                    <p>Symbol code: ${point.data.symbol_code} – ${getWeatherDescription(point.data.symbol_code)}</p>
+                                    <p>Symbol code: ${point.data.symbol_code} – ${getWeatherIcon(point.data.symbol_code)}</p>
                                 </li>
                             `).join("")}
                         </ul>
