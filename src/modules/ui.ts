@@ -122,7 +122,7 @@ searchInput?.addEventListener("input", () => {
     .join("");
 });
 
-cityResults?.addEventListener("click", (event) => {
+cityResults?.addEventListener("click", async (event) => {
     const button = (event.target as HTMLElement)
         .closest<HTMLButtonElement>(".city-result");
 
@@ -142,7 +142,15 @@ cityResults?.addEventListener("click", (event) => {
 
     locationDialog?.close();
     printLocationInfo("city", lat, lon);
-    getWeather(lat, lon);
+
+    const forecast = await getWeather(lat, lon);
+    if (forecast) {
+    printWeatherForecast(
+    forecast.today,
+    forecast.overviewHours,
+    forecast.nextMorning
+    );
+    }
     scheduleWeatherUpdate(lat, lon);
 });
 
@@ -311,7 +319,7 @@ export function printWeatherForecast(
 const useCoordinatesButton =
 document.querySelector<HTMLButtonElement>("#use-coordinates");
 
-useCoordinatesButton?.addEventListener("click", () => {
+useCoordinatesButton?.addEventListener("click", async () => {
     const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
     const latInput =
         document.querySelector<HTMLInputElement>("#latitude");
@@ -338,11 +346,17 @@ useCoordinatesButton?.addEventListener("click", () => {
 
     const location = findNearestLocation(lat, lon);
     localStorage.setItem("cityName", formatCity(location));
-
     locationDialog?.close();
 
     printLocationInfo("Manual", lat, lon);
-    getWeather(lat, lon);
+    const forecast = await getWeather(lat, lon);
+    if (forecast) {
+    printWeatherForecast(
+    forecast.today,
+    forecast.overviewHours,
+    forecast.nextMorning
+    );
+    }
     scheduleWeatherUpdate(lat, lon);
 });
 

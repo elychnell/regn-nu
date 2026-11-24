@@ -9,13 +9,13 @@ const savedLocation = localStorage.getItem("location");
 if (!savedLocation) {
     showLocationPicker();
 } else {
+    let forecast = null;
     switch (savedLocation) {
         case "city":
             const lat = Number(localStorage.getItem("lat"));
             const lon = Number(localStorage.getItem("long"));
             printLocationInfo("city", lat, lon);
-            const forecast = await getWeather(lat, lon);
-
+            forecast = await getWeather(lat, lon);
             if (forecast) {
             printWeatherForecast(
             forecast.today,
@@ -23,21 +23,34 @@ if (!savedLocation) {
             forecast.nextMorning
             );
             }
-            
             scheduleWeatherUpdate(lat, lon);
             break;
         case "manual":
             const manualLat = Number(localStorage.getItem("latitude"));
             const manualLon = Number(localStorage.getItem("longitude"));
             printLocationInfo("Manual", manualLat, manualLon);
-            getWeather(manualLat, manualLon);
+            forecast = await getWeather(manualLat, manualLon);
+            if (forecast) {
+            printWeatherForecast(
+            forecast.today,
+            forecast.overviewHours,
+            forecast.nextMorning
+            );
+            }
             scheduleWeatherUpdate(manualLat, manualLon);
             break;
         case "gps":
             const gpsLat = Number(localStorage.getItem("lat"));
             const gpsLon = Number(localStorage.getItem("long"));
             printLocationInfo("GPS", gpsLat, gpsLon);
-            getWeather(gpsLat, gpsLon);
+            forecast = await getWeather(gpsLat, gpsLon);
+            if (forecast) {
+            printWeatherForecast(
+            forecast.today,
+            forecast.overviewHours,
+            forecast.nextMorning
+            );
+            }
             scheduleWeatherUpdate(gpsLat, gpsLon);
             break;
     }

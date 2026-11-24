@@ -1,5 +1,6 @@
 import { getTodayAndTomorrowPoints, buildRainPeriods } from "./rain.ts";
 import { buildDayForecasts, buildDayOverview, getTodayForecast, buildMorningForecasts, getNextMorningForecast } from "../utils/forecast.ts";
+import { printWeatherForecast } from "./ui.ts";
 
 export async function getWeather(lat: number, lon: number) {
     const url = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json`;
@@ -44,7 +45,14 @@ export function scheduleWeatherUpdate(lat: number, lon: number) {
     const delay = nextHour.getTime() - now.getTime();
 
     setTimeout(async () => {
-        await getWeather(lat, lon);
+        const forecast = await getWeather(lat, lon);
+        if (forecast) {
+        printWeatherForecast(
+        forecast.today,
+        forecast.overviewHours,
+        forecast.nextMorning
+        );
+        }
         scheduleWeatherUpdate(lat, lon);
     }, delay);
 }
