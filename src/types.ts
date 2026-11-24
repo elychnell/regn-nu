@@ -51,3 +51,9 @@ export type Location = {
     locality?: string;
     county?: string;
 }
+
+export type WeatherForecast = {
+    today: DayForecast;
+    overviewHours: WeatherPoint[] | undefined;
+    nextMorning: MorningForecast | undefined;
+};
