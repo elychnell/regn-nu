@@ -28,7 +28,7 @@ export async function getWeather(lat: number, lon: number) {
         const overviewHours = buildDayOverview(data,today.date,rainPeriods);
         const mornings = buildMorningForecasts(days);
         const nextMorning = getNextMorningForecast(mornings);
-        const morningOverviewHours = nextMorning ? buildDayOverview(data,nextMorning.date,rainPeriods) : undefined;
+        //const morningOverviewHours = nextMorning ? buildDayOverview(data,nextMorning.date,rainPeriods) : undefined;
     
         return {today, overviewHours, nextMorning };
         } catch (error) {

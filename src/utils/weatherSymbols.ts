@@ -1,5 +1,5 @@
 
-const temperatureIcon = `<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+/* const temperatureIcon = `<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
 <defs><style>.cls-1{fill:none;stroke:#020202;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs>
 <circle class="cls-1" cx="16.3" cy="3.89" r="0.48"/>
 <circle class="cls-1" cx="6.27" cy="17.73" r="0.95"/>
@@ -31,6 +31,7 @@ const rainIcon = `
     stroke-linecap="round"
     stroke-linejoin="round"
   /></svg>`;
+*/
 
 export function getWeatherIcon(symbolCode: number): string {
    switch (symbolCode) {
@@ -91,5 +92,5 @@ export function getWeatherIcon(symbolCode: number): string {
         default:
             return "Okänt väder";
     }
-    return rainIcon;
+    return "default";
 }
