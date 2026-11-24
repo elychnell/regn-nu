@@ -23,7 +23,13 @@ if (!savedLocation) {
             forecast.nextMorning
             );
             }
-            scheduleWeatherUpdate(lat, lon);
+            scheduleWeatherUpdate(lat, lon, (forecast) => {
+            printWeatherForecast(
+                forecast.today,
+                forecast.overviewHours,
+                forecast.nextMorning
+                );
+            });
             break;
         case "manual":
             const manualLat = Number(localStorage.getItem("latitude"));
@@ -37,7 +43,13 @@ if (!savedLocation) {
             forecast.nextMorning
             );
             }
-            scheduleWeatherUpdate(manualLat, manualLon);
+            scheduleWeatherUpdate(manualLat, manualLon, (forecast) => {
+            printWeatherForecast(
+                forecast.today,
+                forecast.overviewHours,
+                forecast.nextMorning
+                );
+            });
             break;
         case "gps":
             const gpsLat = Number(localStorage.getItem("lat"));
@@ -51,7 +63,13 @@ if (!savedLocation) {
             forecast.nextMorning
             );
             }
-            scheduleWeatherUpdate(gpsLat, gpsLon);
+            scheduleWeatherUpdate(gpsLat, gpsLon, (forecast) => {
+                printWeatherForecast(
+                    forecast.today,
+                    forecast.overviewHours,
+                    forecast.nextMorning
+                );
+            });
             break;
     }
 }
