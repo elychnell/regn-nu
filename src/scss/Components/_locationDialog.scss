@@ -1,4 +1,5 @@
 @use "../variables";
+
 dialog {
     background-color: #1a1a1a;
     border: 1px solid #333333;
@@ -27,3 +28,16 @@ dialog .city-results {
     max-height: 150px;
     overflow-y: auto;
 }
+
+/*
+Mixins for responsive design:
+@include sm
+
+@include md
+
+@include lg
+
+@include xl
+
+@include xxl
+*/
