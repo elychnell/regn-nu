@@ -1,4 +1,4 @@
-import "./scss/style.scss";
+import "./scss/main.scss";
 import { getWeather, scheduleWeatherUpdate } from "./modules/weather.ts";
 import { showLocationPicker, printLocationInfo, printWeatherForecast } from "./modules/ui.ts";
 

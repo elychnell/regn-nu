@@ -1,39 +1,110 @@
+import clearDay from "@meteocons/svg/fill/clear-day.svg?url";
+import clearNight from "@meteocons/svg/fill/clear-night.svg?url";
+import partlyCloudyDay from "@meteocons/svg/fill/partly-cloudy-day.svg?url";
+import partlyCloudyNight from "@meteocons/svg/fill/partly-cloudy-night.svg?url";
+import overcastDay from "@meteocons/svg/fill/overcast-day.svg?url";
+import overcastNight from "@meteocons/svg/fill/overcast-night.svg?url";
+import overcast from "@meteocons/svg/fill/overcast.svg?url";
+import fogDay from "@meteocons/svg/fill/fog-day.svg?url";
+import fogNight from "@meteocons/svg/fill/fog-night.svg?url";
+import partlyCloudyDayRain from "@meteocons/svg/fill/partly-cloudy-day-rain.svg?url";
+import partlyCloudyNightRain from "@meteocons/svg/fill/partly-cloudy-night-rain.svg?url";
+import thunderstormsDayRain from "@meteocons/svg/fill/thunderstorms-day-rain.svg?url";
+import thunderstormsNightRain from "@meteocons/svg/fill/thunderstorms-night-rain.svg?url";
+import partlyCloudyDaySleet from "@meteocons/svg/fill/partly-cloudy-day-sleet.svg?url";
+import partlyCloudyNightSleet from "@meteocons/svg/fill/partly-cloudy-night-sleet.svg?url";
+import partlyCloudyDaySnow from "@meteocons/svg/fill/partly-cloudy-day-snow.svg?url";
+import partlyCloudyNightSnow from "@meteocons/svg/fill/partly-cloudy-night-snow.svg?url";
+import drizzle from "@meteocons/svg/fill/drizzle.svg?url";
+import rain from "@meteocons/svg/fill/rain.svg?url";
+import thunderstormsRain from "@meteocons/svg/fill/thunderstorms-rain.svg?url";
+import sleet from "@meteocons/svg/fill/sleet.svg?url";
+import snow from "@meteocons/svg/fill/snow.svg?url";
+import notAvailable from "@meteocons/svg/fill/not-available.svg?url";
+import { isNight } from "./sun.ts";
 
-/* const temperatureIcon = `<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
-<defs><style>.cls-1{fill:none;stroke:#020202;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs>
-<circle class="cls-1" cx="16.3" cy="3.89" r="0.48"/>
-<circle class="cls-1" cx="6.27" cy="17.73" r="0.95"/>
-<path class="cls-1" d="M10.09,14.89V5.32a3.82,3.82,0,0,0-7.64,0v9.57a4.77,4.77,0,1,0,8.6,2.84A4.74,4.74,0,0,0,10.09,14.89Z"/>
-<line class="cls-1" x1="6.27" y1="10.09" x2="6.27" y2="16.77"/><line class="cls-1" x1="10.09" y1="6.27" x2="12.95" y2="6.27"/>
-<line class="cls-1" x1="10.09" y1="10.09" x2="12.95" y2="10.09"/><line class="cls-1" x1="10.09" y1="13.91" x2="12.95" y2="13.91"/>
-<path class="cls-1" d="M22.5,10.09A1.9,1.9,0,0,1,20.59,12h0a1.91,1.91,0,0,1-1.91-1.91V7.23a1.91,1.91,0,0,1,1.91-1.91h0A1.9,1.9,0,0,1,22.5,7.23"/></svg>`
+const iconUrls: Record<string, string> = {
+    "clear-day": clearDay,
+    "clear-night": clearNight,
+    "partly-cloudy-day": partlyCloudyDay,
+    "partly-cloudy-night": partlyCloudyNight,
+    "overcast-day": overcastDay,
+    "overcast-night": overcastNight,
+    "overcast": overcast,
+    "fog-day": fogDay,
+    "fog-night": fogNight,
+    "partly-cloudy-day-rain": partlyCloudyDayRain,
+    "partly-cloudy-night-rain": partlyCloudyNightRain,
+    "thunderstorms-day-rain": thunderstormsDayRain,
+    "thunderstorms-night-rain": thunderstormsNightRain,
+    "partly-cloudy-day-sleet": partlyCloudyDaySleet,
+    "partly-cloudy-night-sleet": partlyCloudyNightSleet,
+    "partly-cloudy-day-snow": partlyCloudyDaySnow,
+    "partly-cloudy-night-snow": partlyCloudyNightSnow,
+    "drizzle": drizzle,
+    "rain": rain,
+    "thunderstorms-rain": thunderstormsRain,
+    "sleet": sleet,
+    "snow": snow,
+    "not-available": notAvailable
+};
 
-const rainIcon = `
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  width="100%"
-  height="100%"
->
-  <path
-  d="M13.6,16.77h4.6a4.3,4.3,0,1,0,0-8.59h-.56a6,6,0,0,0,.09-.95,5.73,5.73,0,0,0-11.46,0,4.77,4.77,0,0,0,0,9.54H10.4"
-  fill="none"
-  stroke="#64748b"
-  stroke-width="1.91"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  />
-  <path
-    d="M14.86,19.64a2.86,2.86,0,0,1-5.72,0c0-1.91,2.86-4.78,2.86-4.78S14.86,17.73,14.86,19.64Z"
-    fill="none"
-    stroke="#38bdf8"
-    stroke-width="1.91"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  /></svg>`;
-*/
 
-export function getWeatherIcon(symbolCode: number): string {
+export function getSmhiIconName(symbolCode: number, isNight = false) {
+  const time = isNight ? 'night' : 'day';
+
+  const map: Record<number, string> = {
+    1: `clear-${time}`,                      // Klart
+    2: `partly-cloudy-${time}`,              // Lätt molnighet
+    3: `partly-cloudy-${time}`,              // Halvklart
+    4: `overcast-${time}`,                   // Molnigt
+    5: 'overcast',                           // Mycket moln
+    6: 'overcast',                           // Mulet
+    7: `fog-${time}`,                        // Dimma
+    8: `partly-cloudy-${time}-rain`,         // Lätt regnskur
+    9: `partly-cloudy-${time}-rain`,         // Regnskur
+    10: `partly-cloudy-${time}-rain`,        // Kraftig regnskur
+    11: `thunderstorms-${time}-rain`,        // Åskskur
+    12: `partly-cloudy-${time}-sleet`,        // Lätt by av regn och snö
+    13: `partly-cloudy-${time}-sleet`,        // By av regn och snö
+    14: `partly-cloudy-${time}-sleet`,        // Kraftig by av regn och snö
+    15: `partly-cloudy-${time}-snow`,         // Lätt snöby
+    16: `partly-cloudy-${time}-snow`,         // Snöby
+    17: `partly-cloudy-${time}-snow`,         // Kraftig snöby
+    18: 'drizzle',                           // Lätt regn
+    19: 'rain',                              // Regn
+    20: 'rain',                              // Kraftigt regn (alt. 'extreme-rain')
+    21: 'thunderstorms-rain',                // Åska
+    22: 'sleet',                             // Lätt snöblandat regn
+    23: 'sleet',                             // Snöblandat regn
+    24: 'sleet',                             // Kraftigt snöblandat regn
+    25: 'snow',                              // Lätt snöfall
+    26: 'snow',                              // Snöfall
+    27: 'snow'                               // Kraftigt snöfall (alt. 'extreme-snow')
+  };
+
+  return map[symbolCode] || 'not-available';
+}
+
+export function getWeatherIcon(
+    symbolCode: number,
+    time: Date
+): string {
+    const iconName = getSmhiIconName(symbolCode, isNight(time));
+    const iconUrl = iconUrls[iconName]  ?? notAvailable;
+
+    const description = getWeatherDescription(symbolCode);
+
+    return `
+    <div class="weatherIconWrap">
+    <span class="weatherIconDesc">${description}</span>
+    <img src="${iconUrl}" alt="${description} icon" class="weatherIcon" />
+    </div>
+    `;
+}
+
+
+export function getWeatherDescription(symbolCode: number): string {
    switch (symbolCode) {
         case 1:
             return "Klart";

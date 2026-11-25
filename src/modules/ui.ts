@@ -4,6 +4,8 @@ import { getWeather, scheduleWeatherUpdate } from "./weather.ts";
 import { useLocationClick, findNearestLocation, formatAccuracy, isValidCoordinates } from "./location";
 import { formatSwedishWeekday, formatSwedishTime } from "../utils/forecast.ts";
 import { getWeatherIcon } from "../utils/weatherSymbols.ts";
+import thermometer from "@meteocons/svg/fill/thermometer.svg?url";
+import { isNight } from "../utils/sun.ts";
 
 export function showLocationPicker() {
     const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
@@ -270,16 +272,22 @@ export function printWeatherForecast(
             maximumFractionDigits: 1,
         });
 
+
     weatherElm.innerHTML = `
         <section class="todays-forecast">
         <div class="nowSection">
         <h2>Idag${today ? ` – ${formatSwedishWeekday(today.date)}` : ""}</h2>
         ${today? `
-        <div class="nowIcon"><p>Icon: ${getWeatherIcon(today.hours[0].data.symbol_code)}</p></div>
-        <p class="nowTemp">${formatTemperature(today.hours[0].data.air_temperature)} °C - ${getWeatherIcon(today.hours[0].data.symbol_code)}</p>
+        <div class="nowIcon">${getWeatherIcon(today.hours[0].data.symbol_code, new Date(today.hours[0].time))}</div>
+        <div class="nowTemp">
+        <img src="${thermometer}" alt="Temperature Icon" class="temperatureIcon" />
+        <p>${formatTemperature(today.hours[0].data.air_temperature)} °C</p>
         </div>
         <div class ="nowDetails">
-        <p class="nowTempRange">${formatTemperature(today.minTemperature)}–${formatTemperature(today.maxTemperature)} °C</p>
+        <div class="nowTempRange">
+        <p class="nowTempRangeMin">Min: ${formatTemperature(today.minTemperature)} °C</p>
+        <p class="nowTempRangeMax">Max: ${formatTemperature(today.maxTemperature)} °C</p>
+        </div>
         <p>Vind: ${today.hours[0].data.wind_speed} m/s, Gust: ${today.hours[0].data.wind_speed_of_gust}m/s</p>
         <p>Nederbörd: ${today.hours[0].data.precipitation_amount_mean} mm</p>
         </div>
@@ -288,8 +296,17 @@ export function printWeatherForecast(
             <ul class="todays-forecast-list">
             ${dayOverview?.map(point => `
             <li>
-            <p>${formatSwedishTime(point.time)} | Icon:${point.data.symbol_code}</p>
-            <p>${formatTemperature(point.data.air_temperature)} °C – ${getWeatherIcon(point.data.symbol_code)}</p>
+            
+            <p class="pointTime">${formatSwedishTime(point.time)}</p>
+            <p class="pointIcon">${getWeatherIcon(point.data.symbol_code, new Date(point.time))}</p>
+            <div class="pointTempIcon">
+            <img src="${thermometer}" alt="Temperature Icon" class="temperatureIcon" />
+            <p class="pointTemp">${formatTemperature(point.data.air_temperature)} °C
+            </div>
+            <p class="pointPercipitation">Nederbörd: ${point.data.precipitation_amount_mean} mm
+            <p class="pointWind">Vind: ${point.data.wind_speed} m/s, Gust: ${point.data.wind_speed_of_gust} m/s
+            </p>
+            
             </li>
             `).join("")}
             </ul>
@@ -311,7 +328,7 @@ export function printWeatherForecast(
                                 <li>
                                     <p>${formatSwedishTime(point.time)}
                                     – ${formatTemperature(point.data.air_temperature)} °C</p>
-                                    <p>Symbol code: ${point.data.symbol_code} – ${getWeatherIcon(point.data.symbol_code)}</p>
+                                    <p>${getWeatherIcon(point.data.symbol_code, new Date(point.time))}</p>
                                 </li>
                             `).join("")}
                         </ul>

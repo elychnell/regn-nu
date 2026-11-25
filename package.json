@@ -12,5 +12,8 @@
     "sass": "^1.104.1",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@meteocons/svg": "^0.1.0"
   }
 }

@@ -1,0 +1,13 @@
+@use "_variables";
+@use "./Components/header";
+@use "./Components/_locationDialog";
+@use "./Components/_weatherCards";
+@use "./Components/_weatherIcons";
+
+html {
+    background-color: #080808;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+}

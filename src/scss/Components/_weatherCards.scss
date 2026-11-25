@@ -1,0 +1,27 @@
+@use "../variables";
+
+.todays-forecast {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.todays-forecast-list {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+
+.todays-forecast li {
+  border: 1px solid #333333;
+}
+
+.tomorrow-forecast-list  {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
