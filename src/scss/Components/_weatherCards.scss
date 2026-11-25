@@ -1,4 +1,4 @@
-@use "../variables";
+@use "../variables" as *;
 
 .todays-forecast {
   display: flex;
@@ -6,6 +6,13 @@
   align-items: center;
   margin-bottom: 1rem;
 }
+
+.todays-forecast .clothing-icon {
+  color: $clothingIconColor;
+  width: 50px;
+  height: 50px;
+}
+
 .todays-forecast-list {
   list-style-type: none;
   display: flex;

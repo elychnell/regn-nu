@@ -6,6 +6,7 @@ import { formatSwedishWeekday, formatSwedishTime } from "../utils/forecast.ts";
 import { getWeatherIcon } from "../utils/weatherSymbols.ts";
 import thermometer from "@meteocons/svg/fill/thermometer.svg?url";
 import { isNight } from "../utils/sun.ts";
+import { getClothingIcon } from "../utils/clothingIcons.ts";
 
 export function showLocationPicker() {
     const locationDialog = document.querySelector<HTMLDialogElement>("#location-dialog");
@@ -277,6 +278,7 @@ export function printWeatherForecast(
         <section class="todays-forecast">
         <div class="nowSection">
         <h2>Idag${today ? ` – ${formatSwedishWeekday(today.date)}` : ""}</h2>
+        ${getClothingIcon("downJacket", "mysse")}
         ${today? `
         <div class="nowIcon">${getWeatherIcon(today.hours[0].data.symbol_code, new Date(today.hours[0].time))}</div>
         <div class="nowTemp">
